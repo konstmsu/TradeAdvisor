@@ -23,4 +23,7 @@
     <ProjectReference Include="..\TradeAdvisor\TradeAdvisor.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="EmptyTextFile.txt" />
+  </ItemGroup>
 </Project>
