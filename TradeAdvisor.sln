@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28701.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradeAdvisor", "TradeAdvisor\TradeAdvisor.csproj", "{F6982278-8FA9-4BBF-A92F-EC4F209063CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeAdvisor.Test", "TradeAdvisor.Test\TradeAdvisor.Test.csproj", "{8EEE38C6-055C-4FCB-A13E-468339E3E97A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F6982278-8FA9-4BBF-A92F-EC4F209063CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6982278-8FA9-4BBF-A92F-EC4F209063CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6982278-8FA9-4BBF-A92F-EC4F209063CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6982278-8FA9-4BBF-A92F-EC4F209063CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EEE38C6-055C-4FCB-A13E-468339E3E97A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EEE38C6-055C-4FCB-A13E-468339E3E97A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EEE38C6-055C-4FCB-A13E-468339E3E97A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EEE38C6-055C-4FCB-A13E-468339E3E97A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FE3E2A13-CE1D-409D-8C24-75D33C759495}
+	EndGlobalSection
+EndGlobal
