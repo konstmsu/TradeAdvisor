@@ -14,5 +14,7 @@ namespace TradeAdvisor.Test
         }
 
         public void Dispose() => dispose?.Invoke();
+
+        public static implicit operator T(Scoped<T> value) => value.Value;
     }
 }

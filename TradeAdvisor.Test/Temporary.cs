@@ -10,14 +10,11 @@ namespace TradeAdvisor.Test
         {
             var directory = new DirectoryInfo(Path.GetRandomFileName());
             directory.Create();
-            return new Scoped<DirectoryInfo>(directory, () => directory.Delete(true));
-        }
-
-        public static (DirectoryInfo, IDisposable) GetEmptyDirectory2()
-        {
-            var directory = new DirectoryInfo(Path.GetRandomFileName());
-            directory.Create();
-            return (directory, new Disposable(() => directory.Delete(true)));
+            return new Scoped<DirectoryInfo>(directory, () =>
+            {
+                directory.Delete(true);
+                directory.Refresh();
+            });
         }
     }
 }

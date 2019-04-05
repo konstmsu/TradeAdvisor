@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -16,9 +17,22 @@ namespace TradeAdvisor.Test
         }
 
         [TestMethod]
-        public async Task ShouldGetCachedDayIndexRange()
+        public void ShouldGetCachedDayIndexRange()
         {
-            new HistoricalDataCache(new DirectoryInfo(".")).GetCachedDayRange().Should().BeEmpty();
+            using (var directory = Temporary.GetEmptyDirectory())
+                new HistoricalDataCache(directory).GetCachedDayRange().Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void ShouldThrowForInvalidDays()
+        {
+            using (var directory = Temporary.GetEmptyDirectory())
+                new HistoricalDataCache(directory).Invoking(async c => await c.EnsurePopulated(0, 1))
+                    .Should().Throw<Exception>().WithMessage("No such day");
+
+            using (var directory = Temporary.GetEmptyDirectory())
+                new HistoricalDataCache(directory).Invoking(async c => await c.EnsurePopulated(9999, 9999))
+                    .Should().Throw<Exception>().WithMessage("No such day");
         }
 
         [TestMethod]
@@ -26,23 +40,10 @@ namespace TradeAdvisor.Test
         {
             using (var directory = Temporary.GetEmptyDirectory())
             {
-                var cache = new HistoricalDataCache(directory.Value);
+                var cache = new HistoricalDataCache(directory);
                 await cache.EnsurePopulated(8, 11);
-                cache.GetCachedDayRange().Should().Equal(new[] { 8, 9, 10, 11 });
+                cache.GetCachedDayRange().Should().Equal(new Day[] { 8, 9, 10, 11 });
             }
-        }
-    }
-
-    [TestClass]
-    public class TemporaryTests
-    {
-        [TestMethod]
-        public void ShouldDeleteDirectoryOnDispose()
-        {
-            var directory = Temporary.GetEmptyDirectory();
-            directory.Value.Exists.Should().BeTrue();
-            directory.Dispose();
-            directory.Value.Exists.Should().BeFalse();
         }
     }
 }
