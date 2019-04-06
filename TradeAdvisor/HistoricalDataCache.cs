@@ -11,8 +11,13 @@ namespace TradeAdvisor
     public class HistoricalDataCache
     {
         readonly DirectoryInfo CacheDirectory;
+        readonly ISgxClient Sgx;
 
-        public HistoricalDataCache(DirectoryInfo cacheDirectory) => CacheDirectory = cacheDirectory;
+        public HistoricalDataCache(ISgxClient sgx, DirectoryInfo cacheDirectory)
+        {
+            CacheDirectory = cacheDirectory;
+            Sgx = sgx;
+        }
 
         public async Task EnsurePopulated(Day from, Day to)
         {
@@ -29,19 +34,16 @@ namespace TradeAdvisor
 
         async Task CacheDay(Day day)
         {
-            var client = new HttpClient();
-            var response = await client.GetAsync(SgxClient.GetHistoricalUrl(day));
-
-            if (!response.IsSuccessStatusCode)
-                throw new Exception(response.ReasonPhrase);
-
-            using (var file = new FileStream(CacheDirectory.GetFile(GetFileName(day)).FullName, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
-                await response.Content.CopyToAsync(file);
+            var response = await Sgx.GetDay(day);
+            await File.WriteAllTextAsync(CacheDirectory.GetFile(GetFileName(day)).FullName, response);
         }
 
         string GetFileName(Day day) => $"SESprice-{day.Index}.dat";
 
-        public HistoricalDataCache() : this(KnownPaths.SolutionRoot.GetDirectory("SGX Securities Historical")) { }
+        public HistoricalDataCache(ISgxClient sgx)
+            : this(sgx, KnownPaths.SolutionRoot.GetDirectory("SGX Securities Historical"))
+        {
+        }
 
         public IReadOnlyList<Day> GetCachedDayRange() =>
             CacheDirectory.GetFiles("SESprice-*.dat").Select(GetDay).ToList().OrderBy(i => i.Index).ToList();

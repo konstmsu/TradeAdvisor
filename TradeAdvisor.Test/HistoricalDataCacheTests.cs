@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+using Moq;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -19,28 +19,20 @@ namespace TradeAdvisor.Test
         [TestMethod]
         public void ShouldGetCachedDayIndexRange()
         {
+            var sgx = new Mock<ISgxClient>();
             using (var directory = Temporary.GetEmptyDirectory())
-                new HistoricalDataCache(directory).GetCachedDayRange().Should().BeEmpty();
-        }
-
-        [TestMethod]
-        public void ShouldThrowForInvalidDays()
-        {
-            using (var directory = Temporary.GetEmptyDirectory())
-                new HistoricalDataCache(directory).Invoking(async c => await c.EnsurePopulated(0, 1))
-                    .Should().Throw<Exception>().WithMessage("No such day");
-
-            using (var directory = Temporary.GetEmptyDirectory())
-                new HistoricalDataCache(directory).Invoking(async c => await c.EnsurePopulated(9999, 9999))
-                    .Should().Throw<Exception>().WithMessage("No such day");
+                new HistoricalDataCache(sgx.Object, directory).GetCachedDayRange().Should().BeEmpty();
         }
 
         [TestMethod]
         public async Task ShouldCache()
         {
+            var sgx = new Mock<ISgxClient>();
+            sgx.Setup(c => c.GetDay(It.IsAny<Day>())).ReturnsAsync((Day day) => $"Hello day {day.Index}!");
+
             using (var directory = Temporary.GetEmptyDirectory())
             {
-                var cache = new HistoricalDataCache(directory);
+                var cache = new HistoricalDataCache(sgx.Object, directory);
                 await cache.EnsurePopulated(8, 11);
                 cache.GetCachedDayRange().Should().Equal(new Day[] { 8, 9, 10, 11 });
             }

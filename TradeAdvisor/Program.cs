@@ -8,7 +8,8 @@ namespace TradeAdvisor
     {
         static async Task Main(string[] args)
         {
-            var cache = new HistoricalDataCache();
+            var sgx = new SgxClient();
+            var cache = new HistoricalDataCache(sgx);
             for(var i = 0; i <100; i++)
             {
                 var range = cache.GetCachedDayRange();
