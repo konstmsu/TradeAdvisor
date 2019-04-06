@@ -12,7 +12,6 @@ namespace TradeAdvisor.Test
             var directory = Temporary.GetEmptyDirectory();
             directory.Value.Exists.Should().BeTrue();
             directory.Dispose();
-            directory.Value.Refresh();
             directory.Value.Exists.Should().BeFalse();
         }
     }
