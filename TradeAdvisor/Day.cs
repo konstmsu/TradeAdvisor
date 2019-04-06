@@ -13,6 +13,8 @@ namespace TradeAdvisor
 
         public Day(int index) => Index = index;
 
+        public override string ToString() => $"{Index}";
+
         public static implicit operator Day(int index) => new Day(index);
 
         public static IReadOnlyList<Day> RangeInclusive(Day from, Day to) =>

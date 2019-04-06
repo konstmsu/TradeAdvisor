@@ -1,20 +1,16 @@
 ﻿using System;
 using System.IO;
+using TradeAdvisor.Utils;
 
 namespace TradeAdvisor.Test
 {
-
     public static class Temporary
     {
-        public static Scoped<DirectoryInfo> GetEmptyDirectory()
+        public static Scoped<DirectoryPath> GetEmptyDirectory()
         {
-            var directory = new DirectoryInfo(Path.GetRandomFileName());
+            var directory = new DirectoryPath(Path.GetRandomFileName());
             directory.Create();
-            return new Scoped<DirectoryInfo>(directory, () =>
-            {
-                directory.Delete(true);
-                directory.Refresh();
-            });
+            return Scoped.Create(directory, () => directory.Delete());
         }
     }
 }

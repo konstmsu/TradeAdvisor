@@ -1,16 +1,17 @@
 ﻿using System;
 using System.IO;
+using TradeAdvisor.Utils;
 
 namespace TradeAdvisor
 {
     public static class KnownPaths
     {
-        public static DirectoryInfo SolutionRoot => solutionRoot.Value;
-        static readonly Lazy<DirectoryInfo> solutionRoot = new Lazy<DirectoryInfo>(FindSolutionRoot);
+        public static DirectoryPath SolutionRoot => solutionRoot.Value;
+        static readonly Lazy<DirectoryPath> solutionRoot = new Lazy<DirectoryPath>(FindSolutionRoot);
 
-        static DirectoryInfo FindSolutionRoot()
+        static DirectoryPath FindSolutionRoot()
         {
-            var current = new DirectoryInfo(Directory.GetCurrentDirectory());
+            var current = DirectoryPath.CurrentWorkingDirectory;
 
             for (; ; )
             {

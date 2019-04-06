@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.IO;
 using System.Threading.Tasks;
+using TradeAdvisor.Utils;
 
 namespace TradeAdvisor.Test
 {
@@ -12,8 +13,8 @@ namespace TradeAdvisor.Test
         [TestMethod]
         public void ShouldExtractDayIndex()
         {
-            HistoricalDataCache.GetDay(new FileInfo("SESprice-5416.dat")).Should().Be((Day)5416);
-            HistoricalDataCache.GetDay(new FileInfo("SESprice-32.dat")).Should().Be((Day)32);
+            HistoricalDataCache.GetDay(new FilePath("SESprice-5416.dat")).Should().Be((Day)5416);
+            HistoricalDataCache.GetDay(new FilePath("SESprice-32.dat")).Should().Be((Day)32);
         }
 
         [TestMethod]

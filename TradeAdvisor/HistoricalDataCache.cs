@@ -5,15 +5,19 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using NLog;
+using TradeAdvisor.Utils;
 
 namespace TradeAdvisor
 {
     public class HistoricalDataCache
     {
-        readonly DirectoryInfo CacheDirectory;
+        static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
+        readonly DirectoryPath CacheDirectory;
         readonly ISgxClient Sgx;
 
-        public HistoricalDataCache(ISgxClient sgx, DirectoryInfo cacheDirectory)
+        public HistoricalDataCache(ISgxClient sgx, DirectoryPath cacheDirectory)
         {
             CacheDirectory = cacheDirectory;
             Sgx = sgx;
@@ -21,7 +25,6 @@ namespace TradeAdvisor
 
         public async Task EnsurePopulated(Day from, Day to)
         {
-            CacheDirectory.Create();
             var cachedDays = GetCachedDayRange().ToHashSet();
             foreach (var day in Day.RangeInclusive(from, to))
             {
@@ -34,8 +37,10 @@ namespace TradeAdvisor
 
         async Task CacheDay(Day day)
         {
-            var response = await Sgx.GetDay(day);
-            await File.WriteAllTextAsync(CacheDirectory.GetFile(GetFileName(day)).FullName, response);
+            var cacheFile = CacheDirectory.GetFile(GetFileName(day));
+            logger.Info($"Caching day {day} to file {cacheFile}...");
+            CacheDirectory.Create();
+            await File.WriteAllTextAsync(cacheFile.Absolute, await Sgx.GetDay(day));
         }
 
         string GetFileName(Day day) => $"SESprice-{day.Index}.dat";
@@ -48,6 +53,6 @@ namespace TradeAdvisor
         public IReadOnlyList<Day> GetCachedDayRange() =>
             CacheDirectory.GetFiles("SESprice-*.dat").Select(GetDay).ToList().OrderBy(i => i.Index).ToList();
 
-        public static Day GetDay(FileInfo cachedDayFile) => int.Parse(Regex.Match(cachedDayFile.Name, @"\d+").Value);
+        public static Day GetDay(FilePath cachedDayFile) => int.Parse(Regex.Match(cachedDayFile.Name, @"\d+").Value);
     }
 }
