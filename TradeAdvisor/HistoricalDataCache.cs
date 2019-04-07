@@ -21,18 +21,18 @@ namespace TradeAdvisor
 
         public async Task<string> GetDay(Day day)
         {
-            var (cacheFile, content) = await EsureDayCached(day);
+            var content = await EsureDayCached(day);
             return content();
         }
 
-        public async Task<(FilePath cacheFile, Func<string> content)> EsureDayCached(Day day)
+        public async Task<Func<string>> EsureDayCached(Day day)
         {
             var cacheFile = GetCacheFile(day);
 
             if (cacheFile.Exists)
             {
                 logger.Debug($"Found {day} cached as {cacheFile}");
-                return (cacheFile, () => File.ReadAllText(cacheFile.Absolute));
+                return () => File.ReadAllText(cacheFile.Absolute);
             }
 
             CacheDirectory.Create();
@@ -40,7 +40,7 @@ namespace TradeAdvisor
 
             logger.Info($"Caching {day} to file {cacheFile}...");
             await File.WriteAllTextAsync(cacheFile.Absolute, data);
-            return (cacheFile, () => data);
+            return () => data;
         }
 
         public FilePath GetCacheFile(Day day) => CacheDirectory.GetFile($"SESprice-{day.Index}.dat");
