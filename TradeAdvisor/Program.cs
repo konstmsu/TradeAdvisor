@@ -31,7 +31,7 @@ namespace TradeAdvisor
 
                 try
                 {
-                    await cache.GetDay(day);
+                    await cache.EsureDayCached(day);
                 }
                 catch (HttpRequestException ex)
                 {
