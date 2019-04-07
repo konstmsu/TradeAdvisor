@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace TradeAdvisor.Utils
 {
@@ -14,5 +17,8 @@ namespace TradeAdvisor.Utils
         public string Name => Path.GetFileName(Absolute);
 
         public override string ToString() => Absolute;
+
+        public IEnumerable<string> ReadLines() => Exists ? File.ReadLines(Absolute) : new string[0];
+        public Task WriteLines(IEnumerable<string> lines) => File.WriteAllLinesAsync(Absolute, lines);
     }
 }

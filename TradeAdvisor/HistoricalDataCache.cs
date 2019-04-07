@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text.RegularExpressions;
+﻿using System.IO;
 using System.Threading.Tasks;
 using NLog;
 using TradeAdvisor.Utils;
@@ -23,36 +18,29 @@ namespace TradeAdvisor
             Sgx = sgx;
         }
 
-        public async Task EnsurePopulated(Day from, Day to)
+        public async Task<string> GetDay(Day day)
         {
-            var cachedDays = GetCachedDayRange().ToHashSet();
-            foreach (var day in Day.RangeInclusive(from, to))
+            var cacheFile = GetCacheFile(day);
+
+            if (cacheFile.Exists)
             {
-                if (cachedDays.Contains(day))
-                    continue;
-
-                await CacheDay(day);
+                logger.Debug($"Found {day} cached as {cacheFile}"); 
+                return File.ReadAllText(cacheFile.Absolute);
             }
-        }
 
-        async Task CacheDay(Day day)
-        {
-            var cacheFile = CacheDirectory.GetFile(GetFileName(day));
-            logger.Info($"Caching day {day} to file {cacheFile}...");
             CacheDirectory.Create();
-            await File.WriteAllTextAsync(cacheFile.Absolute, await Sgx.GetDay(day));
+            var data = await Sgx.GetDay(day);
+
+            logger.Info($"Caching {day} to file {cacheFile}...");
+            await File.WriteAllTextAsync(cacheFile.Absolute, data);
+            return data;
         }
 
-        string GetFileName(Day day) => $"SESprice-{day.Index}.dat";
+        public FilePath GetCacheFile(Day day) => CacheDirectory.GetFile($"SESprice-{day.Index}.dat");
 
         public HistoricalDataCache(ISgxClient sgx)
-            : this(sgx, KnownPaths.SolutionRoot.GetDirectory("SGX Securities Historical"))
+            : this(sgx, KnownPaths.SolutionRoot.GetDirectory("data/sgx"))
         {
         }
-
-        public IReadOnlyList<Day> GetCachedDayRange() =>
-            CacheDirectory.GetFiles("SESprice-*.dat").Select(GetDay).ToList().OrderBy(i => i.Index).ToList();
-
-        public static Day GetDay(FilePath cachedDayFile) => int.Parse(Regex.Match(cachedDayFile.Name, @"\d+").Value);
     }
 }
